@@ -1,31 +1,31 @@
 import { Schema, model } from "mongoose";
 
-const vehicleSchema = new Schema({
-  vehicle_registration: {
+const userSchema = new Schema({
+  user: {
     type: String,
     required: true,
   },
-  vehicle_brand: {
+  password: {
     type: String,
     required: true,
   },
-  vehicle_model: {
+  name: {
     type: String,
     required: true,
   },
-  color: {
+  last_name: {
     type: String,
     required: true,
   },
-  vehicle_state: {
+  email: {
     type: String,
     required: true,
   },
-  owners: {
-    type: String,
+  phone: {
+    type: Number,
     required: true,
   },
-  vehicle_type: {
+  id_rol: {
     type: String,
     required: true,
   },
@@ -39,4 +39,4 @@ const vehicleSchema = new Schema({
   },
 });
 
-export default model("Vehicle", vehicleSchema);
+export default model("User", userSchema);
