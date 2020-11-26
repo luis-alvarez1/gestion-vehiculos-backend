@@ -4,38 +4,42 @@ const vehicleSchema = new Schema({
   vehicle_registration: {
     type: String,
     required: true,
+    trim: true,
   },
   vehicle_brand: {
     type: String,
     required: true,
+    trim: true,
   },
   vehicle_model: {
     type: String,
     required: true,
+    trim: true,
   },
   color: {
     type: String,
     required: true,
+    trim: true,
   },
   vehicle_state: {
-    type: String,
-    required: true,
+    type: Schema.Types.ObjectId,
+    ref: "State",
   },
   owners: {
-    type: String,
-    required: true,
+    type: Schema.Types.ObjectId,
+    ref: "Owner",
   },
   vehicle_type: {
-    type: String,
-    required: true,
+    type: Schema.Types.ObjectId,
+    ref: "Type",
   },
   userCreate: {
-    type: String,
-    required: true,
+    type: Schema.Types.ObjectId,
+    ref: "Usuario",
   },
   userUpdate: {
-    type: String,
-    required: true,
+    type: Schema.Types.ObjectId,
+    ref: "Usuario",
   },
 });
 

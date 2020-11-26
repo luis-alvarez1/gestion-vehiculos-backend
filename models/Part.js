@@ -2,12 +2,14 @@ import { Schema, model } from "mongoose";
 
 const partSchema = new Schema({
   id_part: {
-    type: String,
+    type: Number,
     required: true,
+    trim: true,
   },
   cost: {
-    type: String,
+    type: Number,
     required: true,
+    trim: true,
   },
 });
 

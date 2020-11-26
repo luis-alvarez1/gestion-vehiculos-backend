@@ -2,23 +2,24 @@ import { Schema, model } from "mongoose";
 
 const repairSchema = new Schema({
   vehicle_state: {
-    type: String,
-    required: true,
+    type: Schema.Types.ObjectId,
+    ref: "State",
   },
   cost: {
-    type: String,
+    type: Number,
     required: true,
+    trim: true,
   },
   vehicle: {
-    type: String,
-    required: true,
+    type: Schema.Types.ObjectId,
+    ref: "Vehicle",
   },
   id_spare_part: {
-    type: String,
-    required: true,
+    type: Schema.Types.ObjectId,
+    ref: "Part",
   },
   authorization: {
-    type: String,
+    type: Boolean,
     required: true,
   },
 });

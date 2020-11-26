@@ -8,34 +8,40 @@ const ownerSchema = new Schema({
   num_document: {
     type: String,
     required: true,
+    trim: true,
   },
   name: {
     type: String,
     required: true,
+    trim: true,
   },
   last_name: {
     type: String,
     required: true,
+    trim: true,
   },
   email: {
     type: String,
     required: true,
+    trim: true,
+    unique: true,
   },
   phone: {
     type: Number,
     required: true,
+    trim: true,
   },
   userCreate: {
-    type: String,
-    required: true,
+    type: Schema.Types.ObjectId,
+    ref: "Usuario",
   },
   userUpdate: {
-    type: String,
-    required: true,
+    type: Schema.Types.ObjectId,
+    ref: "Usuario",
   },
   vehicles: {
-    type: String,
-    required: true,
+    type: Schema.Types.ObjectId,
+    ref: "Vehicle",
   },
 });
 
