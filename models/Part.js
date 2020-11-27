@@ -6,6 +6,11 @@ const partSchema = new Schema({
     required: true,
     trim: true,
   },
+  name_part: {
+    type: String,
+    required: true,
+    trim: true,
+  },
   cost: {
     type: Number,
     required: true,

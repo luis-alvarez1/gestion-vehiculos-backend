@@ -11,6 +11,7 @@ const typeDefs = gql`
     rols: [Rol!]!
     types: [Type!]!
     vehicles: [Vehicle!]!
+    getVehiclesByOwner(input: IDOwnerInput): [Vehicle!]!
     states: [State!]!
   }
 
@@ -31,25 +32,38 @@ const typeDefs = gql`
 
     "OWNERS"
     createOwner(owner: OwnerInput): Owner
+    updateOwner(owner: OwnerInputUpdate): Owner
+    removeOwner(owner: OwnerInputRemove): String
 
     "PARTS"
     createPart(part: PartInput): Part
+    updatePart(part: PartInputUpdate): Part
+    removePart(part: PartInputRemove): String
 
     "REPAIRS"
     createRepair(repair: RepairInput): Repair
+    updateRepair(repair: RepairInputUpdate): Repair
+    removeRepair(repair: RepairInputRemove): String
 
     "ROLS"
     createRol(rol: RolInput): Rol
+    updateRol(rol: RolInputUpdate): Rol
+    removeRol(rol: RolInputRemove): String
 
     "STATES"
     createState(state: StateInput): State
+    updateState(state: StateInputUpdate): State
+    removeState(state: StateInputRemove): String
 
     "TYPES"
     createType(type: TypeInput): Type
+    updateType(type: TypeInputUpdate): Type
+    removeType(type: TypeInputRemove): String
 
     "VEHICLES"
     createVehicle(vehicle: VehicleInput): Vehicle
     updateVehicle(vehicle: VehicleInputUpdate): Vehicle
+    removeVehicle(vehicle: VehicleInputRemove): String
   }
 
   "TYPE"
@@ -90,6 +104,7 @@ const typeDefs = gql`
   type Part {
     _id: ID!
     id_part: Int!
+    name_part: String!
     cost: Int!
   }
 
@@ -174,6 +189,7 @@ const typeDefs = gql`
     _id: ID!
   }
 
+  "OWNER"
   input OwnerInput {
     URLPhoto: String!
     num_document: String!
@@ -181,53 +197,140 @@ const typeDefs = gql`
     last_name: String!
     email: String!
     phone: Int!
+    vehicles: ID!
   }
 
+  input OwnerInputUpdate {
+    _id: ID!
+    URLPhoto: String
+    num_document: String
+    name: String
+    last_name: String
+    email: String
+    phone: Int
+    vehicles: ID
+  }
+
+  input OwnerInputRemove {
+    _id: ID!
+  }
+
+  "PART"
   input PartInput {
-    _id: ID!
     id_part: Int!
+    name_part: String!
     cost: Int!
   }
 
+  input PartInputUpdate {
+    _id: ID
+    id_part: Int
+    name_part: String
+    cost: Int
+  }
+
+  input PartInputRemove {
+    _id: ID
+  }
+
+  "REPAIR"
   input RepairInput {
-    _id: ID!
+    vehicle_state: ID!
     cost: Int!
+    vehicle: ID!
+    id_spare_part: ID!
     authorization: Boolean!
   }
 
-  input RolInput {
+  input RepairInputUpdate {
     _id: ID!
+    vehicle_state: ID
+    cost: Int
+    vehicle: ID
+    id_spare_part: ID
+    authorization: Boolean
+  }
+
+  input RepairInputRemove {
+    _id: ID!
+  }
+
+  "ROL"
+  input RolInput {
     id_rol: Int!
     name_rol: String!
   }
 
-  input StateInput {
+  input RolInputUpdate {
     _id: ID!
+    id_rol: Int!
+    name_rol: String
+  }
+
+  input RolInputRemove {
+    _id: ID!
+  }
+
+  "STATE"
+  input StateInput {
     id_state: Int!
     name_state: String!
   }
 
-  input TypeInput {
+  input StateInputUpdate {
     _id: ID!
+    id_state: Int
+    name_state: String
+  }
+
+  input StateInputRemove {
+    _id: ID!
+  }
+
+  "TYPE"
+  input TypeInput {
     id_type: Int!
     name_type: String!
   }
 
-  input VehicleInput {
+  input TypeInputUpdate {
     _id: ID!
+    id_type: Int
+    name_type: String
+  }
+
+  input TypeInputRemove {
+    _id: ID!
+  }
+
+  "VEHICLE"
+  input VehicleInput {
     vehicle_registration: String!
     vehicle_brand: String!
     vehicle_model: String!
     color: String!
+    vehicle_state: ID!
+    owner: ID!
+    vehicle_type: ID!
   }
 
   input VehicleInputUpdate {
-    _id: ID
-    name: String
-    vehicle_registration: String!
-    vehicle_brand: String!
-    vehicle_model: String!
-    color: String!
+    _id: ID!
+    vehicle_registration: String
+    vehicle_brand: String
+    vehicle_model: String
+    color: String
+    vehicle_state: ID
+    owner: ID
+    vehicle_type: ID
+  }
+
+  input VehicleInputRemove {
+    _id: ID!
+  }
+
+  input IDOwnerInput {
+    _id: ID!
   }
 `;
 export default typeDefs;

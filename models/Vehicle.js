@@ -25,10 +25,12 @@ const vehicleSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "State",
   },
-  owners: {
-    type: Schema.Types.ObjectId,
-    ref: "Owner",
-  },
+  owners: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Owner",
+    },
+  ],
   vehicle_type: {
     type: Schema.Types.ObjectId,
     ref: "Type",

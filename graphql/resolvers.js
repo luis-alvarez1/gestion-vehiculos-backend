@@ -30,7 +30,7 @@ const resolvers = {
       return tasks;
     },
     owners: async (_, {}, ctx) => {
-      return await Owner.find({ userCreate: ctx._id, userUpdate: ctx._id });
+      return await Owner.find();
     },
     parts: async () => {
       return await Part.find();
@@ -44,8 +44,11 @@ const resolvers = {
     types: async () => {
       return await Type.find();
     },
-    vehicles: async (_, {}, ctx) => {
-      return await Vehicle.find({ userCreate: ctx._id, userUpdate: ctx._id });
+    vehicles: async () => {
+      return await Vehicle.find();
+    },
+    getVehiclesByOwner: async (_, { input }) => {
+      return await Vehicle.find({ owner: input._id });
     },
   },
 
@@ -191,43 +194,90 @@ const resolvers = {
       return "Task deleted";
     },
 
-    createOwner: async (_, args) => {
-      const {
-        URLPhoto,
-        num_document,
-        name,
-        last_name,
-        email,
-        phone,
-        userCreate,
-        userUpdate,
-        vehicles,
-      } = args.owner;
-
-      const newOwner = new Owner({
-        URLPhoto,
-        num_document,
-        name,
-        last_name,
-        email,
-        phone,
-        userCreate,
-        userUpdate,
-        vehicles,
-      });
-      return await newOwner.save();
+    // OWNER
+    createOwner: async (root, { input }, ctx) => {
+      try {
+        const owner = new Owner(input);
+        console.log(ctx._id);
+        owner.userCreate = ctx._id;
+        owner.userUpdate = ctx._id;
+        return await Owner.save();
+      } catch (error) {
+        console.log(error);
+      }
     },
 
+    updateOwner: async (root, { input }, ctx) => {
+      const { _id } = input;
+
+      const owner = await Owner.findById({ _id });
+
+      if (!owner) {
+        throw new Error("Owner does not exist");
+      }
+
+      if (owner.userCreate.toString() !== ctx._id) {
+        throw new Error("You are not the creator of this Owner");
+      }
+      owner.userUpdate = ctx._id;
+      return await Owner.findOneAndUpdate({ _id }, input, { new: true });
+    },
+
+    removeOwner: async (root, { input }, ctx) => {
+      const { _id } = input;
+      const owner = await Owner.findById({ _id });
+
+      if (!owner) {
+        throw new Error("Owner does not exist");
+      }
+
+      if (owner.userCreate.toString() !== ctx._id) {
+        throw new Error("You are not the creator of this Owner");
+      }
+
+      await Owner.findOneAndDelete({ _id }, input);
+
+      return "Owner deleted";
+    },
+
+    //PART
     createPart: async (_, args) => {
       const { id_part, cost } = args.part;
 
-      const newPart = new Part({
+      const part = new Part({
         id_part,
+        name_part,
         cost,
       });
-      return await newPart.save();
+      return await part.save();
     },
 
+    updatePart: async (root, { input }, ctx) => {
+      const { _id } = input;
+
+      const part = await Part.findById({ _id });
+
+      if (!part) {
+        throw new Error("Part does not exist");
+      }
+
+      return await Part.findOneAndUpdate({ _id }, input, { new: true });
+    },
+
+    removePart: async (root, { input }, ctx) => {
+      const { _id } = input;
+      const part = await Part.findById({ _id });
+
+      if (!part) {
+        throw new Error("Part does not exist");
+      }
+
+      await Part.findOneAndDelete({ _id }, input);
+
+      return "Part deleted";
+    },
+
+    //REPAIR
     createRepair: async (_, args) => {
       const {
         vehicle_state,
@@ -237,56 +287,193 @@ const resolvers = {
         authorization,
       } = args.repair;
 
-      const newRepair = new Repair({
+      const repair = new Repair({
         vehicle_state,
         cost,
         vehicle,
         id_spare_part,
         authorization,
       });
-      return await newRepair.save();
+      return await repair.save();
     },
 
+    updateRepair: async (root, { input }, ctx) => {
+      const { _id } = input;
+
+      const repair = await Repair.findById({ _id });
+
+      if (!repair) {
+        throw new Error("Repair does not exist");
+      }
+
+      return await Repair.findOneAndUpdate({ _id }, input, { new: true });
+    },
+
+    removeRepair: async (root, { input }, ctx) => {
+      const { _id } = input;
+      const repair = await Repair.findById({ _id });
+
+      if (!repair) {
+        throw new Error("Repair does not exist");
+      }
+
+      await Repair.findOneAndDelete({ _id }, input);
+
+      return "Repair deleted";
+    },
+
+    // ROL
     createRol: async (_, args) => {
       const { id_rol, name_rol } = args.rol;
 
-      const newRol = new Rol({
+      const rol = new Rol({
         id_rol,
         name_rol,
       });
-      return await newRol.save();
+      return await rol.save();
     },
 
+    updateRol: async (root, { input }, ctx) => {
+      const { _id } = input;
+
+      const rol = await Rol.findById({ _id });
+
+      if (!rol) {
+        throw new Error("Rol does not exist");
+      }
+
+      return await Rol.findOneAndUpdate({ _id }, input, { new: true });
+    },
+
+    removePart: async (root, { input }, ctx) => {
+      const { _id } = input;
+      const rol = await Rol.findById({ _id });
+
+      if (!rol) {
+        throw new Error("Rol does not exist");
+      }
+
+      await Rol.findOneAndDelete({ _id }, input);
+
+      return "Rol deleted";
+    },
+
+    // STATE
     createState: async (_, args) => {
       const { id_state, name_state } = args.state;
 
-      const newState = new State({
+      const state = new State({
         id_state,
         name_state,
       });
-      return await newState.save();
+      return await state.save();
     },
 
+    updateState: async (root, { input }, ctx) => {
+      const { _id } = input;
+
+      const state = await State.findById({ _id });
+
+      if (!state) {
+        throw new Error("State does not exist");
+      }
+
+      return await State.findOneAndUpdate({ _id }, input, { new: true });
+    },
+
+    removeState: async (root, { input }, ctx) => {
+      const { _id } = input;
+      const state = await State.findById({ _id });
+
+      if (!state) {
+        throw new Error("State does not exist");
+      }
+
+      await State.findOneAndDelete({ _id }, input);
+
+      return "State deleted";
+    },
+
+    // TYPE
     createType: async (_, args) => {
       const { id_type, name_type } = args.type;
 
-      const newType = new Type({
+      const type = new Type({
         id_type,
         name_type,
       });
-      return await newType.save();
+      return await type.save();
     },
 
+    updateType: async (root, { input }, ctx) => {
+      const { _id } = input;
+
+      const type = await Type.findById({ _id });
+
+      if (!type) {
+        throw new Error("Type does not exist");
+      }
+
+      return await Type.findOneAndUpdate({ _id }, input, { new: true });
+    },
+
+    removeType: async (root, { input }, ctx) => {
+      const { _id } = input;
+      const type = await Type.findById({ _id });
+
+      if (!type) {
+        throw new Error("Type does not exist");
+      }
+
+      await Type.findOneAndDelete({ _id }, input);
+
+      return "Type deleted";
+    },
+
+    //VEHICLE
     createVehicle: async (root, { input }, ctx) => {
       try {
         const vehicle = new Vehicle(input);
         console.log(ctx._id);
         vehicle.userCreate = ctx._id;
         vehicle.userUpdate = ctx._id;
-        return await proyecto.save();
+        return await Vehicle.save();
       } catch (error) {
         console.log(error);
       }
+    },
+
+    updateVehicle: async (root, { input }, ctx) => {
+      const { _id } = input;
+
+      const vehicle = await Vehicle.findById({ _id });
+
+      if (!vehicle) {
+        throw new Error("Project does not exist");
+      }
+
+      if (vehicle.userCreate.toString() !== ctx._id) {
+        throw new Error("You are not the creator of this project");
+      }
+      vehicle.userUpdate = ctx._id;
+      return await Vehicle.findOneAndUpdate({ _id }, input, { new: true });
+    },
+
+    removeVehicle: async (root, { input }, ctx) => {
+      const { _id } = input;
+      const vehicle = await Vehicle.findById({ _id });
+
+      if (!vehicle) {
+        throw new Error("Task does not exist");
+      }
+
+      if (vehicle.userCreate.toString() !== ctx._id) {
+        throw new Error("You are not the creator of this task");
+      }
+
+      await Vehicle.findOneAndDelete({ _id }, input);
+
+      return "Task deleted";
     },
   },
 };
