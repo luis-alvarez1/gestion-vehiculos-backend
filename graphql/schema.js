@@ -19,39 +19,39 @@ const typeDefs = gql`
     authUser(input: AuthInput): Token
 
     "OWNERS"
-    createOwner(owner: OwnerInput): Owner
-    updateOwner(owner: OwnerInputUpdate): Owner
-    removeOwner(owner: OwnerInputRemove): String
+    createOwner(input: OwnerInput): Owner
+    updateOwner(input: OwnerInputUpdate): Owner
+    removeOwner(input: OwnerInputRemove): String
 
     "PARTS"
-    createPart(part: PartInput): Part
-    updatePart(part: PartInputUpdate): Part
-    removePart(part: PartInputRemove): String
+    createPart(input: PartInput): Part
+    updatePart(input: PartInputUpdate): Part
+    removePart(input: PartInputRemove): String
 
     "REPAIRS"
-    createRepair(repair: RepairInput): Repair
-    updateRepair(repair: RepairInputUpdate): Repair
-    removeRepair(repair: RepairInputRemove): String
+    createRepair(input: RepairInput): Repair
+    updateRepair(input: RepairInputUpdate): Repair
+    removeRepair(input: RepairInputRemove): String
 
     "ROLS"
-    createRol(rol: RolInput): Rol
-    updateRol(rol: RolInputUpdate): Rol
-    removeRol(rol: RolInputRemove): String
+    createRol(input: RolInput): Rol
+    updateRol(input: RolInputUpdate): Rol
+    removeRol(input: RolInputRemove): String
 
     "STATES"
-    createState(state: StateInput): State
-    updateState(state: StateInputUpdate): State
-    removeState(state: StateInputRemove): String
+    createState(input: StateInput): State
+    updateState(input: StateInputUpdate): State
+    removeState(input: StateInputRemove): String
 
     "TYPES"
-    createType(type: TypeInput): Type
-    updateType(type: TypeInputUpdate): Type
-    removeType(type: TypeInputRemove): String
+    createType(input: TypeInput): Type
+    updateType(input: TypeInputUpdate): Type
+    removeType(input: TypeInputRemove): String
 
     "VEHICLES"
-    createVehicle(vehicle: VehicleInput): Vehicle
-    updateVehicle(vehicle: VehicleInputUpdate): Vehicle
-    removeVehicle(vehicle: VehicleInputRemove): String
+    createVehicle(input: VehicleInput): Vehicle
+    updateVehicle(input: VehicleInputUpdate): Vehicle
+    removeVehicle(input: VehicleInputRemove): String
   }
 
   "TYPE"
@@ -152,7 +152,6 @@ const typeDefs = gql`
     last_name: String!
     email: String!
     phone: Int!
-    vehicles: ID!
   }
 
   input OwnerInputUpdate {
@@ -163,7 +162,6 @@ const typeDefs = gql`
     last_name: String
     email: String
     phone: Int
-    vehicles: ID
   }
 
   input OwnerInputRemove {
@@ -265,8 +263,8 @@ const typeDefs = gql`
     vehicle_model: String!
     color: String!
     vehicle_state: ID!
-    owner: ID!
-    vehicle_type: ID!
+    owner: ID
+    vehicle_type: Int!
   }
 
   input VehicleInputUpdate {

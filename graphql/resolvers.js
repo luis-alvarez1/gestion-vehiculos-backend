@@ -89,11 +89,18 @@ const resolvers = {
 
     // OWNER
     createOwner: async (root, { input }, ctx) => {
+      const ownerExist = await Owner.findOne({
+        num_document: input.num_document,
+      });
+
+      if (ownerExist) {
+        throw new Error("Owner already exist");
+      }
+
       try {
         const newOwner = new Owner(input);
-        console.log(ctx._id);
-        owner.userCreate = ctx._id;
-        owner.userUpdate = ctx._id;
+        newOwner.userCreate = ctx._id;
+        newOwner.userUpdate = ctx._id;
         return await newOwner.save();
       } catch (error) {
         console.log(error);
@@ -135,7 +142,7 @@ const resolvers = {
 
     //PART
     createPart: async (_, args) => {
-      const { id_part, cost } = args.part;
+      const { id_part, cost } = args.input;
 
       const newPart = new Part({
         id_part,
@@ -178,7 +185,7 @@ const resolvers = {
         vehicle,
         id_spare_part,
         authorization,
-      } = args.repair;
+      } = args.input;
 
       const newRepair = new Repair({
         vehicle_state,
@@ -217,7 +224,7 @@ const resolvers = {
 
     // ROL
     createRol: async (_, args) => {
-      const { id_rol, name_rol } = args.rol;
+      const { id_rol, name_rol } = args.input;
 
       const newRol = new Rol({
         id_rol,
@@ -253,7 +260,7 @@ const resolvers = {
 
     // STATE
     createState: async (_, args) => {
-      const { id_state, name_state } = args.state;
+      const { id_state, name_state } = args.input;
 
       const newState = new State({
         id_state,
@@ -289,7 +296,7 @@ const resolvers = {
 
     // TYPE
     createType: async (_, args) => {
-      const { id_type, name_type } = args.type;
+      const { id_type, name_type } = args.input;
 
       const newType = new Type({
         id_type,
@@ -310,7 +317,7 @@ const resolvers = {
       return await Type.findOneAndUpdate({ _id }, input, { new: true });
     },
 
-    removeType: async (root, { input }, ctx) => {
+    removeType: async (root, { input }) => {
       const { _id } = input;
       const type = await Type.findById({ _id });
 
@@ -325,11 +332,16 @@ const resolvers = {
 
     //VEHICLE
     createVehicle: async (root, { input }, ctx) => {
+      const vehicule = { ...input };
+
+      const type = await Type.findOne({ id_type: input.vehicle_type });
+
+      vehicule.vehicle_type = type._id.toString();
+
       try {
-        const newVehicle = new Vehicle(input);
-        console.log(ctx._id);
-        vehicle.userCreate = ctx._id;
-        vehicle.userUpdate = ctx._id;
+        const newVehicle = new Vehicle(vehicule);
+        newVehicle.userCreate = ctx._id;
+        newVehicle.userUpdate = ctx._id;
         return await newVehicle.save();
       } catch (error) {
         console.log(error);
