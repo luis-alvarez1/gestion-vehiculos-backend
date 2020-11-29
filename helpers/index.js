@@ -1,3 +1,3 @@
 import * as users from "./users";
 
-export { users };
+export const helpers = { users };

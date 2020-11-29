@@ -8,7 +8,7 @@ import Type from "../models/Type";
 import Vehicle from "../models/Vehicle";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
-import { users } from "../helpers/index";
+import { helpers } from "../helpers/index";
 
 dotenv.config({ path: ".env" });
 
@@ -22,6 +22,10 @@ const resolvers = {
     parts: async () => {
       return await Part.find();
     },
+    states: async () => {
+      return await State.find();
+    },
+
     repairs: async () => {
       return await Repair.find();
     },
@@ -35,11 +39,24 @@ const resolvers = {
       return await Vehicle.find();
     },
     getVehiclesByOwner: async (_, { input }) => {
-      return await Vehicle.find({ owner: input._id });
+      const { _id } = input;
+
+      const owner = await Owner.findById({ _id });
+      if (!owner) {
+        throw new Error("Owner does not exist");
+      }
+
+      const vehicles = await Vehicle.find({ owner: _id });
+
+      vehicles.forEach((v) => {
+        if (owner.vehicles.indexOf(v._id) < 0) {
+          owner.vehicles.push(v._id);
+        }
+      });
+
+      await owner.save();
+      return owner.vehicles;
     },
-    /*addVehiclesByOwner: async (_, { input }) => {
-      return await Owner.find();
-    },*/
   },
 
   //Mutations
@@ -59,7 +76,6 @@ const resolvers = {
       const role = await Rol.findOne({ id_rol: input.rol_id });
 
       user.rol_id = role._id.toString();
-      console.log(user.rol_id, "   ", role);
 
       try {
         const salt = await bcrypt.genSalt(10);
@@ -126,7 +142,7 @@ const resolvers = {
       }
 
       return {
-        token: users.createToken(lastUser, process.env.SECRET, "2hr"),
+        token: helpers.createToken(lastUser, process.env.SECRET, "2hr"),
       };
     },
 
@@ -183,27 +199,26 @@ const resolvers = {
       return "Owner deleted";
     },
 
-    /*addVehiclesByOwner: async (root, { input }, ctx) => {
-      const { _id } = input;
+    addVehiclesByOwner: async (root, { input }, ctx) => {
+      const { _id, vehicles } = input;
 
       const owner = await Owner.findById({ _id });
 
       if (!owner) {
         throw new Error("Owner does not exist");
       }
+      vehicles.forEach(async (v) => {
+        v = await Vehicle.findById(v);
 
-      if (owner.userCreate.toString() !== ctx._id) {
-        throw new Error("You are not the creator of this Owner");
-      }
-      owner.userUpdate = ctx._id;
-      owner.vehicle = [];
-
-      array.forEach((element) => {});
-
-      return await Owner.findOneAndUpdate({ _id }, owner.vehicles, {
-        new: true,
+        if (!v) {
+          throw new Error(`Vehicle with ID: ${v} does not exist`);
+        }
       });
-    },*/
+
+      owner.vehicles = vehicles;
+
+      return await Owner.findOneAndUpdate({ _id }, owner, { new: true });
+    },
 
     //PART
     createPart: async (_, args) => {
@@ -265,8 +280,6 @@ const resolvers = {
 
       repair.id_spare_part = part._id.toString();
 
-      console.log(part, "  ", repair.id_spare_part);
-
       const {
         vehicle_state,
         cost,
@@ -319,7 +332,7 @@ const resolvers = {
       });
 
       if (rolExist) {
-        throw new Error("State already exist");
+        throw new Error("Role already exist");
       }
 
       const newRol = new Rol({

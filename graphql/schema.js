@@ -24,6 +24,7 @@ const typeDefs = gql`
     createOwner(input: OwnerInput): Owner
     updateOwner(input: OwnerInputUpdate): Owner
     removeOwner(input: OwnerInputRemove): String
+    addVehiclesByOwner(input: AddVehiclesByOwnerInput): Owner
 
     "PARTS"
     createPart(input: PartInput): Part
@@ -297,6 +298,10 @@ const typeDefs = gql`
 
   input VehicleInputRemove {
     _id: ID!
+  }
+  input AddVehiclesByOwnerInput {
+    _id: ID!
+    vehicles: [ID!]!
   }
 
   input IDOwnerInput {
