@@ -17,18 +17,8 @@ const typeDefs = gql`
 
   type Mutation {
     "USUARIOS"
-    createUser(input: UsuarioInput): String
+    createUser(input: UserInput): String
     authUser(input: AuthInput): Token
-
-    "PROYECTOS"
-    newProject(input: ProjectInput): Project
-    updateProject(input: UpdateProjectInput): Project
-    removeProject(input: RemoveProjectInput): String
-
-    "TAREAS"
-    newTask(input: TaskInput): Task
-    updateTask(input: TaskInputUpdate): Task
-    removeTask(input: TaskInputRemove): String
 
     "OWNERS"
     createOwner(owner: OwnerInput): Owner
@@ -71,21 +61,13 @@ const typeDefs = gql`
     token: String!
   }
 
-  type Task {
-    _id: ID!
-    name: String!
-    state: Boolean
-    project: String!
-  }
-
   type User {
     name: String!
+    last_name: String!
+    phone: Int!
+    rol_id: ID!
+    salario: Int!
     email: String!
-  }
-  type Project {
-    _id: ID!
-    name: String!
-    creator: ID!
   }
 
   type Owner {
@@ -149,8 +131,12 @@ const typeDefs = gql`
   }
 
   "INPUT"
-  input UsuarioInput {
+  input UserInput {
     name: String!
+    last_name: String!
+    phone: Int!
+    rol_id: ID!
+    salario: Int!
     email: String!
     password: String!
   }
@@ -158,35 +144,6 @@ const typeDefs = gql`
   input AuthInput {
     email: String!
     password: String!
-  }
-
-  input ProjectInput {
-    name: String!
-  }
-  input UpdateProjectInput {
-    _id: ID
-    name: String
-  }
-  input RemoveProjectInput {
-    _id: ID!
-  }
-  input IDProjectInput {
-    project: String!
-  }
-  input TaskInput {
-    name: String!
-    project: String!
-  }
-
-  input TaskInputUpdate {
-    _id: ID!
-    name: String
-    project: String
-    state: Boolean
-  }
-
-  input TaskInputRemove {
-    _id: ID!
   }
 
   "OWNER"

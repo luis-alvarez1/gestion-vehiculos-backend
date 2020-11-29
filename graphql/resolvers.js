@@ -1,6 +1,4 @@
-import Usuario from "../models/usuario";
-import Proyecto from "../models/proyecto";
-import Tarea from "../models/tarea";
+import User from "../models/User";
 import Owner from "../models/Owner";
 import Part from "../models/Part";
 import Repair from "../models/Repair";
@@ -16,19 +14,8 @@ dotenv.config({ path: ".env" });
 
 const resolvers = {
   Query: {
-    projects: async (_, {}, ctx) => {
-      return await Proyecto.find({ creator: ctx._id });
-    },
-    users: async () => await Usuario.find(),
+    users: async () => await User.find(),
 
-    getTasksByProjects: async (_, { input }, ctx) => {
-      const { project } = input;
-
-      const tasks = await Tarea.find({ creator: ctx._id })
-        .where("project")
-        .equals(project);
-      return tasks;
-    },
     owners: async (_, {}, ctx) => {
       return await Owner.find();
     },
@@ -57,7 +44,7 @@ const resolvers = {
     createUser: async (root, { input }, ctx) => {
       const { email, password } = input;
 
-      const userExist = await Usuario.findOne({
+      const userExist = await User.findOne({
         email,
       });
 
@@ -69,7 +56,7 @@ const resolvers = {
         const salt = await bcrypt.genSalt(10);
         input.password = await bcrypt.hash(password, salt);
 
-        const newUser = new Usuario(input);
+        const newUser = new User(input);
         await newUser.save();
 
         return "User Created";
@@ -81,7 +68,7 @@ const resolvers = {
     authUser: async (root, { input }, ctx) => {
       const { email, password } = input;
 
-      const lastUser = await Usuario.findOne({ email });
+      const lastUser = await User.findOne({ email });
 
       if (!lastUser) {
         throw new Error("User does not exist!");
@@ -100,108 +87,14 @@ const resolvers = {
       };
     },
 
-    newProject: async (root, { input }, ctx) => {
-      try {
-        const proyecto = new Proyecto(input);
-        console.log(ctx._id);
-        proyecto.creator = ctx._id;
-        return await proyecto.save();
-      } catch (error) {
-        console.log(error);
-      }
-    },
-
-    updateProject: async (root, { input }, ctx) => {
-      const { _id } = input;
-
-      const project = await Proyecto.findById({ _id });
-
-      if (!project) {
-        throw new Error("Project does not exist");
-      }
-
-      if (project.creator.toString() !== ctx._id) {
-        throw new Error("You are not the creator of this project");
-      }
-
-      return await Proyecto.findOneAndUpdate({ _id }, input, { new: true });
-    },
-    removeProject: async (root, { input }, ctx) => {
-      const { _id } = input;
-
-      const project = await Proyecto.findById({ _id });
-
-      if (!project) {
-        throw new Error("Project does not exist");
-      }
-
-      if (project.creator.toString() !== ctx._id) {
-        throw new Error("You are not the creator of this project");
-      }
-
-      await Proyecto.findOneAndDelete({ _id }, input);
-
-      return "Project deleted";
-    },
-
-    newTask: async (root, { input }, ctx) => {
-      const { name } = input;
-      const taskExist = await Tarea.findOne({
-        name,
-      });
-
-      if (taskExist) {
-        throw new Error("Task already exist ");
-      }
-
-      try {
-        const task = new Tarea(input);
-        task.creator = ctx._id;
-
-        return await task.save();
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    updateTask: async (root, { input }, ctx) => {
-      const { _id } = input;
-      const task = await Tarea.findById({ _id });
-
-      if (!task) {
-        throw new Error("Task does not exist");
-      }
-
-      if (task.creator.toString() !== ctx._id) {
-        throw new Error("You are not the creator of this task");
-      }
-
-      return await Tarea.findOneAndUpdate({ _id }, input, { new: true });
-    },
-    removeTask: async (root, { input }, ctx) => {
-      const { _id } = input;
-      const task = await Tarea.findById({ _id });
-
-      if (!task) {
-        throw new Error("Task does not exist");
-      }
-
-      if (task.creator.toString() !== ctx._id) {
-        throw new Error("You are not the creator of this task");
-      }
-
-      await Tarea.findOneAndDelete({ _id }, input);
-
-      return "Task deleted";
-    },
-
     // OWNER
     createOwner: async (root, { input }, ctx) => {
       try {
-        const owner = new Owner(input);
+        const newOwner = new Owner(input);
         console.log(ctx._id);
         owner.userCreate = ctx._id;
         owner.userUpdate = ctx._id;
-        return await Owner.save();
+        return await newOwner.save();
       } catch (error) {
         console.log(error);
       }
@@ -244,12 +137,12 @@ const resolvers = {
     createPart: async (_, args) => {
       const { id_part, cost } = args.part;
 
-      const part = new Part({
+      const newPart = new Part({
         id_part,
         name_part,
         cost,
       });
-      return await part.save();
+      return await newPart.save();
     },
 
     updatePart: async (root, { input }, ctx) => {
@@ -287,14 +180,14 @@ const resolvers = {
         authorization,
       } = args.repair;
 
-      const repair = new Repair({
+      const newRepair = new Repair({
         vehicle_state,
         cost,
         vehicle,
         id_spare_part,
         authorization,
       });
-      return await repair.save();
+      return await newRepair.save();
     },
 
     updateRepair: async (root, { input }, ctx) => {
@@ -326,11 +219,11 @@ const resolvers = {
     createRol: async (_, args) => {
       const { id_rol, name_rol } = args.rol;
 
-      const rol = new Rol({
+      const newRol = new Rol({
         id_rol,
         name_rol,
       });
-      return await rol.save();
+      return await newRol.save();
     },
 
     updateRol: async (root, { input }, ctx) => {
@@ -362,11 +255,11 @@ const resolvers = {
     createState: async (_, args) => {
       const { id_state, name_state } = args.state;
 
-      const state = new State({
+      const newState = new State({
         id_state,
         name_state,
       });
-      return await state.save();
+      return await newState.save();
     },
 
     updateState: async (root, { input }, ctx) => {
@@ -398,11 +291,11 @@ const resolvers = {
     createType: async (_, args) => {
       const { id_type, name_type } = args.type;
 
-      const type = new Type({
+      const newType = new Type({
         id_type,
         name_type,
       });
-      return await type.save();
+      return await newType.save();
     },
 
     updateType: async (root, { input }, ctx) => {
@@ -433,11 +326,11 @@ const resolvers = {
     //VEHICLE
     createVehicle: async (root, { input }, ctx) => {
       try {
-        const vehicle = new Vehicle(input);
+        const newVehicle = new Vehicle(input);
         console.log(ctx._id);
         vehicle.userCreate = ctx._id;
         vehicle.userUpdate = ctx._id;
-        return await Vehicle.save();
+        return await newVehicle.save();
       } catch (error) {
         console.log(error);
       }
@@ -464,16 +357,16 @@ const resolvers = {
       const vehicle = await Vehicle.findById({ _id });
 
       if (!vehicle) {
-        throw new Error("Task does not exist");
+        throw new Error("Vehicle does not exist");
       }
 
       if (vehicle.userCreate.toString() !== ctx._id) {
-        throw new Error("You are not the creator of this task");
+        throw new Error("You are not the creator of this vehicle");
       }
 
       await Vehicle.findOneAndDelete({ _id }, input);
 
-      return "Task deleted";
+      return "Vehicle deleted";
     },
   },
 };
