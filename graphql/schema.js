@@ -2,9 +2,7 @@ import { gql } from "apollo-server";
 
 const typeDefs = gql`
   type Query {
-    projects: [Project!]!
     users: [User!]!
-    getTasksByProjects(input: IDProjectInput): [Task!]!
     owners: [Owner!]!
     parts: [Part!]!
     repairs: [Repair!]!

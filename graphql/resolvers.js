@@ -342,11 +342,11 @@ const resolvers = {
       const vehicle = await Vehicle.findById({ _id });
 
       if (!vehicle) {
-        throw new Error("Project does not exist");
+        throw new Error("Vehicle does not exist");
       }
 
       if (vehicle.userCreate.toString() !== ctx._id) {
-        throw new Error("You are not the creator of this project");
+        throw new Error("You are not the creator of this vehicle");
       }
       vehicle.userUpdate = ctx._id;
       return await Vehicle.findOneAndUpdate({ _id }, input, { new: true });
