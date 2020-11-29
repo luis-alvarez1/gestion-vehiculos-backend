@@ -37,6 +37,9 @@ const resolvers = {
     getVehiclesByOwner: async (_, { input }) => {
       return await Vehicle.find({ owner: input._id });
     },
+    /*addVehiclesByOwner: async (_, { input }) => {
+      return await Owner.find();
+    },*/
   },
 
   //Mutations
@@ -51,6 +54,12 @@ const resolvers = {
       if (userExist) {
         throw new Error("User already exist ");
       }
+      const user = { ...input };
+
+      const role = await Rol.findOne({ id_rol: input.rol_id });
+
+      user.rol_id = role._id.toString();
+      console.log(user.rol_id, "   ", role);
 
       try {
         const salt = await bcrypt.genSalt(10);
@@ -63,6 +72,40 @@ const resolvers = {
       } catch (error) {
         console.log(error);
       }
+    },
+
+    updateUser: async (root, { input }, ctx) => {
+      const { _id } = input;
+
+      const user = await User.findById({ _id });
+
+      if (!user) {
+        throw new Error("User does not exist");
+      }
+
+      if (user.userCreate.toString() !== ctx._id) {
+        throw new Error("You are not the creator of this User");
+      }
+      user.userUpdate = ctx._id;
+      return await User.findOneAndUpdate({ _id }, input, { new: true });
+    },
+
+    removeOwner: async (root, { input }, ctx) => {
+      const { _id } = input;
+
+      const user = await User.findById({ _id });
+
+      if (!user) {
+        throw new Error("User does not exist");
+      }
+
+      if (user.userCreate.toString() !== ctx._id) {
+        throw new Error("You are not the creator of this User");
+      }
+
+      await User.findOneAndDelete({ _id }, input);
+
+      return "User deleted";
     },
 
     authUser: async (root, { input }, ctx) => {
@@ -140,8 +183,38 @@ const resolvers = {
       return "Owner deleted";
     },
 
+    /*addVehiclesByOwner: async (root, { input }, ctx) => {
+      const { _id } = input;
+
+      const owner = await Owner.findById({ _id });
+
+      if (!owner) {
+        throw new Error("Owner does not exist");
+      }
+
+      if (owner.userCreate.toString() !== ctx._id) {
+        throw new Error("You are not the creator of this Owner");
+      }
+      owner.userUpdate = ctx._id;
+      owner.vehicle = [];
+
+      array.forEach((element) => {});
+
+      return await Owner.findOneAndUpdate({ _id }, owner.vehicles, {
+        new: true,
+      });
+    },*/
+
     //PART
     createPart: async (_, args) => {
+      const partExist = await Part.findOne({
+        id_part: args.input.id_part,
+      });
+
+      if (partExist) {
+        throw new Error("Part already exist");
+      }
+
       const { id_part, cost } = args.input;
 
       const newPart = new Part({
@@ -179,6 +252,21 @@ const resolvers = {
 
     //REPAIR
     createRepair: async (_, args) => {
+      const repairExist = await Repair.findOne({
+        _id: args.input._id,
+      });
+
+      if (repairExist) {
+        throw new Error("Repair already exist");
+      }
+      const repair = { ...input };
+
+      const part = await Part.findOne({ id_part: input.id_spare_part });
+
+      repair.id_spare_part = part._id.toString();
+
+      console.log(part, "  ", repair.id_spare_part);
+
       const {
         vehicle_state,
         cost,
@@ -226,6 +314,14 @@ const resolvers = {
     createRol: async (_, args) => {
       const { id_rol, name_rol } = args.input;
 
+      const rolExist = await Rol.findOne({
+        id_rol: args.input.id_rol,
+      });
+
+      if (rolExist) {
+        throw new Error("State already exist");
+      }
+
       const newRol = new Rol({
         id_rol,
         name_rol,
@@ -245,7 +341,7 @@ const resolvers = {
       return await Rol.findOneAndUpdate({ _id }, input, { new: true });
     },
 
-    removePart: async (root, { input }, ctx) => {
+    removeRol: async (root, { input }, ctx) => {
       const { _id } = input;
       const rol = await Rol.findById({ _id });
 
@@ -261,6 +357,14 @@ const resolvers = {
     // STATE
     createState: async (_, args) => {
       const { id_state, name_state } = args.input;
+
+      const stateExist = await State.findOne({
+        id_state: args.input.id_state,
+      });
+
+      if (stateExist) {
+        throw new Error("State already exist");
+      }
 
       const newState = new State({
         id_state,
@@ -296,6 +400,14 @@ const resolvers = {
 
     // TYPE
     createType: async (_, args) => {
+      const typeExist = await Type.findOne({
+        id_type: args.input.id_type,
+      });
+
+      if (typeExist) {
+        throw new Error("Type already exist");
+      }
+
       const { id_type, name_type } = args.input;
 
       const newType = new Type({
@@ -332,11 +444,27 @@ const resolvers = {
 
     //VEHICLE
     createVehicle: async (root, { input }, ctx) => {
+      const vehicleExist = await Vehicle.findOne({
+        vehicle_registration: input.vehicle_registration,
+      });
+
+      if (vehicleExist) {
+        throw new Error("Vehicle already exist");
+      }
+
       const vehicule = { ...input };
+
+      const state = await State.findOne({ id_state: input.vehicle_state });
+
+      vehicule.vehicle_state = state._id.toString();
 
       const type = await Type.findOne({ id_type: input.vehicle_type });
 
       vehicule.vehicle_type = type._id.toString();
+
+      const ownerid = await Owner.findOne({ num_document: input.owner });
+
+      vehicule.owner = ownerid._id.toString();
 
       try {
         const newVehicle = new Vehicle(vehicule);

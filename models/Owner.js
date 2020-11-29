@@ -28,7 +28,7 @@ const ownerSchema = new Schema(
       unique: true,
     },
     phone: {
-      type: Number,
+      type: String,
       required: true,
       trim: true,
     },

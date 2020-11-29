@@ -17,6 +17,8 @@ const typeDefs = gql`
     "USUARIOS"
     createUser(input: UserInput): String
     authUser(input: AuthInput): Token
+    updateUser(input: UserInputUpdate): String
+    removeUser(input: UserInputRemove): String
 
     "OWNERS"
     createOwner(input: OwnerInput): Owner
@@ -62,7 +64,7 @@ const typeDefs = gql`
   type User {
     name: String!
     last_name: String!
-    phone: Int!
+    phone: String!
     rol_id: ID!
     salario: Int!
     email: String!
@@ -75,10 +77,10 @@ const typeDefs = gql`
     name: String!
     last_name: String!
     email: String!
-    phone: Int!
+    phone: String!
     userCreate: ID!
     userUpdate: ID!
-    vehicles: ID!
+    vehicles: [ID!]
   }
 
   type Part {
@@ -93,7 +95,7 @@ const typeDefs = gql`
     vehicle_state: ID!
     cost: Int!
     vehicle: ID!
-    id_spare_part: ID!
+    id_spare_part: Int!
     authorization: Boolean!
   }
 
@@ -121,9 +123,9 @@ const typeDefs = gql`
     vehicle_brand: String!
     vehicle_model: String!
     color: String!
-    vehicle_state: ID!
+    vehicle_state: Int!
     owner: ID!
-    vehicle_type: ID!
+    vehicle_type: Int!
     userCreate: ID!
     userUpdate: ID!
   }
@@ -132,8 +134,8 @@ const typeDefs = gql`
   input UserInput {
     name: String!
     last_name: String!
-    phone: Int!
-    rol_id: ID!
+    phone: String!
+    rol_id: Int!
     salario: Int!
     email: String!
     password: String!
@@ -144,6 +146,21 @@ const typeDefs = gql`
     password: String!
   }
 
+  input UserInputUpdate {
+    _id: ID!
+    name: String
+    last_name: String
+    phone: String
+    rol_id: Int
+    salario: Int
+    email: String
+    password: String
+  }
+
+  input UserInputRemove {
+    _id: ID!
+  }
+
   "OWNER"
   input OwnerInput {
     URLPhoto: String!
@@ -151,7 +168,7 @@ const typeDefs = gql`
     name: String!
     last_name: String!
     email: String!
-    phone: Int!
+    phone: String!
   }
 
   input OwnerInputUpdate {
@@ -161,7 +178,7 @@ const typeDefs = gql`
     name: String
     last_name: String
     email: String
-    phone: Int
+    phone: String
   }
 
   input OwnerInputRemove {
@@ -190,8 +207,8 @@ const typeDefs = gql`
   input RepairInput {
     vehicle_state: ID!
     cost: Int!
-    vehicle: ID!
-    id_spare_part: ID!
+    vehicle: Int!
+    id_spare_part: Int!
     authorization: Boolean!
   }
 
@@ -199,8 +216,8 @@ const typeDefs = gql`
     _id: ID!
     vehicle_state: ID
     cost: Int
-    vehicle: ID
-    id_spare_part: ID
+    vehicle: Int
+    id_spare_part: Int
     authorization: Boolean
   }
 
@@ -262,7 +279,7 @@ const typeDefs = gql`
     vehicle_brand: String!
     vehicle_model: String!
     color: String!
-    vehicle_state: ID!
+    vehicle_state: Int!
     owner: ID
     vehicle_type: Int!
   }
@@ -273,9 +290,9 @@ const typeDefs = gql`
     vehicle_brand: String
     vehicle_model: String
     color: String
-    vehicle_state: ID
+    vehicle_state: Int
     owner: ID
-    vehicle_type: ID
+    vehicle_type: Int
   }
 
   input VehicleInputRemove {
