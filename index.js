@@ -9,6 +9,8 @@ connect();
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  introspection: true,
+  
   context: ({ req }) => {
     const token = req.headers["authorization"] || "";
     if (token) {
@@ -22,7 +24,8 @@ const server = new ApolloServer({
     }
   },
 });
-server.listen().then(
+
+server.listen({port: process.env.PORT || 4000}).then(
   ({ url }) => console.log("servidor listo en", url),
   (err) => console.log(err)
 );
