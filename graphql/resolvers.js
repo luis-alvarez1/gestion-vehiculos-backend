@@ -81,7 +81,7 @@ const resolvers = {
         const salt = await bcrypt.genSalt(10);
         input.password = await bcrypt.hash(password, salt);
 
-        const newUser = new User(input);
+        const newUser = new User(user);
         await newUser.save();
 
         return "User Created";
